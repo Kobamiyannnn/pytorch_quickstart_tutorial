@@ -141,5 +141,8 @@ print("Done!")
 #################
 print("\n" + "-" * 60 + "\n" + "< Saving Models >")
 
-torch.save(model.state_dict(), "model.pth")
+# torch.save(model.state_dict(), "model.pth")
+# torch.save(model.state_dict(), "model.pth")  # model.state_dict()でパラメータのみ保存
+model_scripted = torch.jit.script(model)
+model_scripted.save("model.pth")
 print("Saved PyTorch Model State to model.pth")
