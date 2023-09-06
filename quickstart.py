@@ -3,6 +3,7 @@ import torch.nn as nn
 from torch.utils.data import DataLoader
 from torchvision import datasets
 from torchvision.transforms import ToTensor
+import time
 
 
 #####################
@@ -31,7 +32,6 @@ batch_size = 64
 # Create data loaders.
 train_dataloader = DataLoader(training_data, batch_size=batch_size)
 test_dataloader = DataLoader(test_data, batch_size=batch_size)
-
 for X, y in test_dataloader:
     print(f"Shape of X [N, C, H, W]: {X.shape}")  # N: Batch size
     print(f"Shape of y: {y.shape} {y.dtype}")
@@ -80,7 +80,6 @@ class NeuralNetwork(nn.Module):
 
 
 model = NeuralNetwork().to(device)
-print(model)
 
 
 ###################################
@@ -94,23 +93,32 @@ optimizer = torch.optim.SGD(model.parameters(), lr=1e-3)
 
 def train(dataloader, model, loss_fn, optimizer):
     size = len(dataloader.dataset)
+    num_batches = len(dataloader)
+    total_correct = 0
+    total_loss = 0
     model.train()
     for batch, (X, y) in enumerate(dataloader):
         X, y = X.to(device), y.to(device)
-
         # Compute prediction error
         pred = model(X)
         loss = loss_fn(pred, y)
+        correct = (pred.argmax(1) == y).type(torch.float).sum().item()
+        total_correct += (pred.argmax(1) == y).type(torch.float).sum().item()
+        total_loss += loss.item()
 
         # Backpropagation
         loss.backward()
         optimizer.step()
         optimizer.zero_grad()
-
         if batch % 100 == 0:
+            # loss.item(): batch番目のミニバッチにおける損失
+            # len(X): バッチサイズと等しい
             loss, current = loss.item(), (batch + 1) * len(X)
-            print(f"loss: {loss:>7f} [{current:>5d}/{size:>5d}]")
-
+            accuracy = correct / len(X)
+            print(f"loss: {loss:>5.4f} - accuracy: {accuracy:>5.4f} [{current:>5d}/{size:>5d}]")
+    total_correct /= size
+    total_loss /= num_batches
+    print(f"Average: \n Accuracy: {(100 * total_correct):>0.1f}%,     Loss: {total_loss:>8f}")
 
 def test(dataloader, model, loss_fn):
     size = len(dataloader.dataset)
@@ -127,12 +135,15 @@ def test(dataloader, model, loss_fn):
     correct /= size
     print(f"Test Error: \n Accuracy: {(100 * correct):>0.1f}%, Avg loss: {test_loss:>8f} \n")
 
-
+elapsed_per_epoch = 0
 epochs = 5
 for t in range(epochs):
-    print(f"Epoch {t+1}\n-------------------------------")
+    time_start = time.perf_counter()
+    print(f"Epoch {t+1} (Former epoch: {elapsed_per_epoch:.2f}s)\n-------------------------------")
     train(train_dataloader, model, loss_fn, optimizer)
     test(test_dataloader, model, loss_fn)
+    time_end = time.perf_counter()
+    elapsed_per_epoch = time_end - time_start
 print("Done!")
 
 
