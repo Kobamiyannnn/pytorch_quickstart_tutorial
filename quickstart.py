@@ -5,6 +5,7 @@ from torchvision import datasets
 from torchvision.transforms import ToTensor
 import time
 from neural_net import NeuralNetwork
+from torchsummary import summary
 import matplotlib.pyplot as plt
 
 
@@ -81,10 +82,9 @@ device = (
 )
 print(f"Using {device} device\n")
 
-
 # Define model
 model = NeuralNetwork().to(device)
-
+summary(model, (1, 28, 28), batch_size=batch_size, device=device)
 
 ###################################
 # Optimizing the Model Parameters #
