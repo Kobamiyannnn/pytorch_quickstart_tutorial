@@ -5,6 +5,7 @@ from torchvision import datasets
 from torchvision.transforms import ToTensor
 import time
 from neural_net import NeuralNetwork
+import matplotlib.pyplot as plt
 
 
 #####################
@@ -14,7 +15,7 @@ print("< Working with data >")
 
 # Download training data from open datasets.
 training_data = datasets.FashionMNIST(
-    root="data",
+    root="./data",
     train=True,
     download=True,
     transform=ToTensor(),
@@ -22,22 +23,48 @@ training_data = datasets.FashionMNIST(
 
 # Download test data from open datasets.
 test_data = datasets.FashionMNIST(
-    root="data",
+    root="./data",
     train=False,
     download=True,
     transform=ToTensor(),
 )
 
-batch_size = 64
+batch_size = 64  # ミニバッチ学習のバッチサイズ
 
 # Create data loaders.
-train_dataloader = DataLoader(training_data, batch_size=batch_size)
-test_dataloader = DataLoader(test_data, batch_size=batch_size)
+train_dataloader = DataLoader(training_data, batch_size=batch_size, shuffle=True)
+test_dataloader = DataLoader(test_data, batch_size=batch_size, shuffle=False)
 for X, y in test_dataloader:
     print(f"Shape of X [N, C, H, W]: {X.shape}")  # N: Batch size
     print(f"Shape of y: {y.shape} {y.dtype}")
     break
 
+# FashionMNISTの全クラス
+classes = [
+    "T-shirt/top",
+    "Trouser",
+    "Pullover",
+    "Dress",
+    "Coat",
+    "Sandal",
+    "Shirt",
+    "Sneaker",
+    "Bag",
+    "Ankle boot",
+]
+
+# 学習データのの表示
+plt.figure()
+for i in range(10):
+    ax = plt.subplot(2, 5, i+1)
+    image, label = training_data[i]
+    img = image.permute(1, 2, 0)  # 軸の入れ替え (C,H,W) -> (H,W,C)
+    plt.imshow(img)
+    ax.set_title(classes[label])
+    # 枠線消し
+    ax.get_xaxis().set_visible(False)
+    ax.get_yaxis().set_visible(False)
+plt.show()
 
 ###################
 # Creating Models #
