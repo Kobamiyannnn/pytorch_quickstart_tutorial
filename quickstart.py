@@ -7,7 +7,7 @@ import time
 from neural_net import NeuralNetwork
 from torchsummary import summary
 import matplotlib.pyplot as plt
-
+import numpy as np
 
 #####################
 # Working with data #
@@ -123,6 +123,7 @@ def train(dataloader, model, loss_fn, optimizer):
     total_correct /= size
     total_loss /= num_batches
     print(f"Average: \n Accuracy: {(100 * total_correct):>0.1f}%,     Loss: {total_loss:>8f}")
+    return total_loss, total_correct
 
 def test(dataloader, model, loss_fn):
     size = len(dataloader.dataset)
@@ -138,17 +139,62 @@ def test(dataloader, model, loss_fn):
     test_loss /= num_batches
     correct /= size
     print(f"Test Error: \n Accuracy: {(100 * correct):>0.1f}%, Avg loss: {test_loss:>8f} \n")
+    return test_loss, correct
 
-elapsed_per_epoch = 0
-epochs = 5
+# 学習を行う
+elapsed_per_epoch = 0  # 1エポックを終えるまでの経過時間
+epochs = 10
+
+train_loss_list = []
+train_acc_list = []
+test_loss_list = []
+test_acc_list = []
+
+avg_train_loss = 0
+avg_train_acc = 0
+avg_test_loss = 0
+avg_test_acc = 0
+
 for t in range(epochs):
     time_start = time.perf_counter()
     print(f"Epoch {t+1} (Former epoch: {elapsed_per_epoch:.2f}s)\n-------------------------------")
-    train(train_dataloader, model, loss_fn, optimizer)
-    test(test_dataloader, model, loss_fn)
+    
+    avg_train_loss, avg_train_acc = train(train_dataloader, model, loss_fn, optimizer)
+    train_loss_list.append(avg_train_loss)
+    train_acc_list.append(avg_train_acc)
+
+    avg_test_loss, avg_test_acc = test(test_dataloader, model, loss_fn)
+    test_loss_list.append(avg_test_loss)
+    test_acc_list.append(avg_test_acc)
+
     time_end = time.perf_counter()
     elapsed_per_epoch = time_end - time_start
+
 print("Done!")
+
+# 学習曲線 (loss)
+fig, ax = plt.subplots()
+ax.set_xlabel("epoch")
+ax.set_ylabel("loss")
+ax.set_title("Learning Curve (Loss)")
+ax.plot(np.arange(0, epochs), train_loss_list, label="train_loss")
+ax.plot(np.arange(0, epochs), test_loss_list, label="test_loss")
+ax.set_xticks(np.arange(0, epochs, 5))
+ax.legend()
+fig.tight_layout()
+plt.savefig("LC_loss.png")
+
+# 学習曲線 (accuracy)
+fig, ax = plt.subplots()
+ax.set_xlabel("epoch")
+ax.set_ylabel("accuracy")
+ax.set_title("Learning Curve (Accuracy)")
+ax.plot(np.arange(0, epochs), train_acc_list, label="train_acc")
+ax.plot(np.arange(0, epochs), test_acc_list, label="test_acc")
+ax.set_xticks(np.arange(0, epochs, 5))
+ax.legend()
+fig.tight_layout()
+plt.savefig("LC_acc.png")
 
 
 #################
