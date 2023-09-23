@@ -8,6 +8,8 @@ from neural_net import NeuralNetwork
 from torchsummary import summary
 import matplotlib.pyplot as plt
 import numpy as np
+from datetime import datetime
+import os
 
 #####################
 # Working with data #
@@ -30,7 +32,7 @@ test_data = datasets.FashionMNIST(
     transform=ToTensor(),
 )
 
-batch_size = 64  # ミニバッチ学習のバッチサイズ
+batch_size = 512  # ミニバッチ学習のバッチサイズ
 
 # Create data loaders.
 train_dataloader = DataLoader(training_data, batch_size=batch_size, shuffle=True)
@@ -84,7 +86,10 @@ print(f"Using {device} device\n")
 
 # Define model
 model = NeuralNetwork().to(device)
-summary(model, (1, 28, 28), batch_size=batch_size, device=device)
+if device != "mps":
+    summary(model, (1, 28, 28), batch_size=batch_size, device=device)
+else:
+    print(model)
 
 ###################################
 # Optimizing the Model Parameters #
@@ -143,7 +148,7 @@ def test(dataloader, model, loss_fn):
 
 # 学習を行う
 elapsed_per_epoch = 0  # 1エポックを終えるまでの経過時間
-epochs = 10
+epochs = 200
 
 train_loss_list = []
 train_acc_list = []
@@ -171,9 +176,11 @@ for t in range(epochs):
     elapsed_per_epoch = time_end - time_start
 
 print("Done!")
+date_now = datetime.now().isoformat(timespec="seconds")
+os.makedirs(f"results/{date_now}")
 
 # 学習曲線 (loss)
-fig, ax = plt.subplots()
+fig, ax = plt.subplots(figsize=(16,9), dpi=120)
 ax.set_xlabel("epoch")
 ax.set_ylabel("loss")
 ax.set_title("Learning Curve (Loss)")
@@ -182,10 +189,10 @@ ax.plot(np.arange(0, epochs), test_loss_list, label="test_loss")
 ax.set_xticks(np.arange(0, epochs, 5))
 ax.legend()
 fig.tight_layout()
-plt.savefig("LC_loss.png")
+plt.savefig(f"./results/{date_now}/LC_loss_{date_now}.png")
 
 # 学習曲線 (accuracy)
-fig, ax = plt.subplots()
+fig, ax = plt.subplots(figsize=(16,9), dpi=120)
 ax.set_xlabel("epoch")
 ax.set_ylabel("accuracy")
 ax.set_title("Learning Curve (Accuracy)")
@@ -194,7 +201,7 @@ ax.plot(np.arange(0, epochs), test_acc_list, label="test_acc")
 ax.set_xticks(np.arange(0, epochs, 5))
 ax.legend()
 fig.tight_layout()
-plt.savefig("LC_acc.png")
+plt.savefig(f"./results/{date_now}/LC_acc_{date_now}.png")
 
 
 #################
@@ -205,5 +212,5 @@ print("\n" + "-" * 60 + "\n" + "< Saving Models >")
 # torch.save(model.state_dict(), "model.pth")
 # torch.save(model.state_dict(), "model.pth")  # model.state_dict()でパラメータのみ保存
 model_scripted = torch.jit.script(model)
-model_scripted.save("model.pth")
+model_scripted.save(f"./results/{date_now}/model_{date_now}.pth")
 print("Saved PyTorch Model State to model.pth")

@@ -1,5 +1,7 @@
 venv/
 data/
+results/
 __pycache__/
 *.pth
 *.png
+.DS_Store
