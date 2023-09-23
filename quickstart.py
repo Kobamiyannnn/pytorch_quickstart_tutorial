@@ -32,7 +32,7 @@ test_data = datasets.FashionMNIST(
     transform=ToTensor(),
 )
 
-batch_size = 512  # ミニバッチ学習のバッチサイズ
+batch_size = 128  # ミニバッチ学習のバッチサイズ
 
 # Create data loaders.
 train_dataloader = DataLoader(training_data, batch_size=batch_size, shuffle=True)
