@@ -1,3 +1,5 @@
+# バリデーションも含めながら自分で実装してみる
+
 import torch
 import torch.nn as nn
 from torchvision import datasets
@@ -104,3 +106,30 @@ if device != "mps":
 else:
     print(model)
 
+loss_fn = nn.CrossEntropyLoss()  # 損失関数の定義
+optimizer = torch.optim.Adam(model.parameters())  # 最適化アルゴリズムの定義
+
+########################
+# モデルの学習用関数の定義 #
+########################
+def train(dataloader, model, loss_fn, optimizer):
+    """
+    Method for train
+    """
+    num_train_data = len(dataloader.dataset)  # 学習データの総数
+    num_batches    = len(dataloader)  # バッチの総数
+    
+
+def validation(dataloader, model, loss_fn):
+    """
+    Method for validation
+    """
+
+def test(dataloader, model, loss_fn):
+    """
+    Method for test
+    """
+
+#####################
+# モデルの学習フェーズ #
+#####################
