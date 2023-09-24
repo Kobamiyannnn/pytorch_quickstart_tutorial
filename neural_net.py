@@ -3,14 +3,16 @@ import torch.nn as nn
 
 # Define model
 class NeuralNetwork(nn.Module):
-    def __init__(self):
+    def __init__(self, img_size: int):
+        self.img_size = img_size
+        h = w = self.img_size
         """
         Define the layers of the network.
         """
         super().__init__()
         self.flatten = nn.Flatten()
         self.linear_relu_stack = nn.Sequential(
-            nn.Linear(28 * 28, 512),
+            nn.Linear(h * w, 512),
             nn.ReLU(),
             nn.Linear(512, 512),
             nn.ReLU(),
