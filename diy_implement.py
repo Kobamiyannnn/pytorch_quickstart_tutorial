@@ -51,7 +51,7 @@ channels = 0
 for X, y in train_dataloader:
     print(f"Batch size             : {batch_size}")
     print(f"Shape of X [N, C, H, W]: {X.shape}")
-    print(f"Shape of y             : {y.shape}\n")
+    print(f"Shape of y             : {y.shape} {y.dtype}\n")
     img_size = X.shape[2]
     channels = X.shape[1]
     break
@@ -99,7 +99,7 @@ if device == "cuda":
 elif device == "mps":
     torch.mps.manual_seed(0)
 
-model = NeuralNetwork(img_size=img_size).to(device)
+model = NeuralNetwork(img_size=img_size, channels=channels).to(device)
 # モデル構造の確認
 if device != "mps":
     summary(model, (channels, img_size, img_size), batch_size=batch_size, device=device)
@@ -112,13 +112,30 @@ optimizer = torch.optim.Adam(model.parameters())  # 最適化アルゴリズム�
 ########################
 # モデルの学習用関数の定義 #
 ########################
-def train(dataloader, model, loss_fn, optimizer):
+def train(
+    dataloader: DataLoader,
+    model: nn.Module, 
+    loss_fn: nn.Module, 
+    optimizer: torch.optim.Optimizer  
+    ) -> None:  
     """
-    Method for train
+    学習用関数。1エポックだけのサイクルとなる
     """
+    model.train()
+
     num_train_data = len(dataloader.dataset)  # 学習データの総数
     num_batches    = len(dataloader)  # バッチの総数
     
+    for batch, (X, y) in enumerate(dataloader):
+        X, y = X.to(device), y.to(device)
+
+        pred = model(X)
+        loss = loss_fn(pred, y)
+        
+        # 誤差逆伝播
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
 
 def validation(dataloader, model, loss_fn):
     """
@@ -133,3 +150,9 @@ def test(dataloader, model, loss_fn):
 #####################
 # モデルの学習フェーズ #
 #####################
+epochs = 1
+
+for t in range(epochs):
+    train(train_dataloader, model, loss_fn, optimizer)
+
+print("Done!")

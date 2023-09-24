@@ -3,8 +3,9 @@ import torch.nn as nn
 
 # Define model
 class NeuralNetwork(nn.Module):
-    def __init__(self, img_size: int):
+    def __init__(self, img_size: int, channels: int):
         self.img_size = img_size
+        self.channel = channels
         h = w = self.img_size
         """
         Define the layers of the network.
@@ -12,7 +13,7 @@ class NeuralNetwork(nn.Module):
         super().__init__()
         self.flatten = nn.Flatten()
         self.linear_relu_stack = nn.Sequential(
-            nn.Linear(h * w, 512),
+            nn.Linear(h * w * channels, 512),
             nn.ReLU(),
             nn.Linear(512, 512),
             nn.ReLU(),

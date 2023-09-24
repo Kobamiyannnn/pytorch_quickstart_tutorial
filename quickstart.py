@@ -89,7 +89,7 @@ device = (
 print(f"Using {device} device\n")
 
 # Define model
-model = NeuralNetwork(img_size=28).to(device)
+model = NeuralNetwork(img_size=img_size, channels=channels).to(device)
 if device != "mps":
     summary(model, (channels, img_size, img_size), batch_size=batch_size, device=device)
 else:
