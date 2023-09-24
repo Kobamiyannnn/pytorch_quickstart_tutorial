@@ -37,9 +37,13 @@ batch_size = 128  # ミニバッチ学習のバッチサイズ
 # Create data loaders.
 train_dataloader = DataLoader(training_data, batch_size=batch_size, shuffle=True)
 test_dataloader = DataLoader(test_data, batch_size=batch_size, shuffle=False)
+img_size = 0
+channels = 0
 for X, y in test_dataloader:
     print(f"Shape of X [N, C, H, W]: {X.shape}")  # N: Batch size
     print(f"Shape of y: {y.shape} {y.dtype}")
+    img_size = X.shape[2]
+    channels = X.shape[1]
     break
 
 # FashionMNISTの全クラス
@@ -85,9 +89,9 @@ device = (
 print(f"Using {device} device\n")
 
 # Define model
-model = NeuralNetwork().to(device)
+model = NeuralNetwork(img_size=28).to(device)
 if device != "mps":
-    summary(model, (1, 28, 28), batch_size=batch_size, device=device)
+    summary(model, (channels, img_size, img_size), batch_size=batch_size, device=device)
 else:
     print(model)
 
