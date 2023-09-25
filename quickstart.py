@@ -126,6 +126,7 @@ def train(dataloader, model, loss_fn, optimizer):
         if batch % 100 == 0:
             # loss.item(): batch番目のミニバッチにおける損失
             # len(X): バッチサイズと等しい
+            print(correct)
             loss, current = loss.item(), (batch + 1) * len(X)
             accuracy = correct / len(X)
             print(f"loss: {loss:>5.4f} - accuracy: {accuracy:>5.4f} [{current:>5d}/{size:>5d}]")
@@ -152,7 +153,7 @@ def test(dataloader, model, loss_fn):
 
 # 学習を行う
 elapsed_per_epoch = 0  # 1エポックを終えるまでの経過時間
-epochs = 200
+epochs = 10
 
 train_loss_list = []
 train_acc_list = []
