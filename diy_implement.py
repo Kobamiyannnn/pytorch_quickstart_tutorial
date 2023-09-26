@@ -14,6 +14,7 @@ import numpy as np
 import time
 from datetime import datetime
 import os
+import platform
 
 
 ###################
@@ -233,7 +234,11 @@ avg_test_acc, avg_test_loss = test(test_dataloader, model, loss_fn)
 print(f"    Avg test loss: {avg_test_loss:>5.4f}, Avg test accuracy: {avg_test_acc:>5.4f}")
 
 # 学習結果保存用のディレクトリ作成
-date_now = datetime.now().isoformat(timespec='seconds')
+if not(platform.system() == "Windows"):
+    date_now = datetime.now().isoformat(timespec='seconds')
+else:
+    date_now = datetime.now().strftime("%Y%m%dT%H-%M-%S")
+
 os.makedirs(f"results/{date_now}")
 
 def save_learning_curve_of_loss(train_loss_list: list, val_loss_list: list, date_now: str) -> None:
@@ -243,14 +248,24 @@ def save_learning_curve_of_loss(train_loss_list: list, val_loss_list: list, date
     epochs = len(train_loss_list)
     
     fig, ax = plt.subplots(figsize=(16,9), dpi=120)
-    ax.set_xlabel("epoch")
-    ax.set_ylabel("loss")
+
+    ax.set_xlabel("Epochs")
+    ax.set_ylabel("Loss")
     ax.set_title("Learning Curve (Loss)")
-    ax.plot(np.arange(0, epochs), train_loss_list, label="train_loss")
-    ax.plot(np.arange(0, epochs), val_loss_list, label="val_loss")
-    ax.set_xticks(np.arange(0, epochs, 5))
+
+    ax.plot(train_loss_list, label="Train loss")
+    ax.plot(val_loss_list, label="Val loss")
+
+    # TODO: TypeError: 'builtin_function_or_method' object is not subscriptable
+    ax.set_xticks(np.concatenate([np.array[0], np.arange(4, epochs, 5)]))
+    ax.set_xticklables(np.concatenate([np.array[1], np.arange(5, epochs+1, 5)], dtype="unicode"))
+
+    ax.set_ylim(0)
+
+    ax.grid()
     ax.legend()
     fig.tight_layout()
+
     plt.savefig(f"./results/{date_now}/LC_loss_{date_now}.png")
 
 def save_learning_curve_of_acc(train_acc_list: list, val_acc_list: list, date_now: str) -> None:
@@ -260,14 +275,24 @@ def save_learning_curve_of_acc(train_acc_list: list, val_acc_list: list, date_no
     epochs = len(train_acc_list)
 
     fig, ax = plt.subplots(figsize=(16,9), dpi=120)
+
     ax.set_xlabel("epoch")
     ax.set_ylabel("accuracy")
     ax.set_title("Learning Curve (Accuracy)")
-    ax.plot(np.arange(0, epochs), train_acc_list, label="train_acc")
-    ax.plot(np.arange(0, epochs), val_acc_list, label="val_acc")
-    ax.set_xticks(np.arange(0, epochs, 5))
+
+    ax.plot(train_acc_list, label="Train acc")
+    ax.plot(val_acc_list, label="Val acc")
+
+    # TODO: TypeError: 'builtin_function_or_method' object is not subscriptable
+    ax.set_xticks(np.concatenate([np.array[0], np.arange(4, epochs, 5)]))
+    ax.set_xticklables(np.concatenate([np.array[1], np.arange(5, epochs+1, 5)], dtype="unicode"))
+
+    ax.set_ylim(0)
+
+    ax.grid()
     ax.legend()
     fig.tight_layout()
+
     plt.savefig(f"./results/{date_now}/LC_acc_{date_now}.png")
 
 save_learning_curve_of_acc(train_acc_list, val_acc_list, date_now)
