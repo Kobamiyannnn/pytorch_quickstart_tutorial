@@ -20,14 +20,14 @@ import platform
 ###################
 # データセットの準備 #
 ###################
-training_data = datasets.CIFAR10(
+training_data = datasets.FashionMNIST(
     root='./data',
     train=True,
     download=True,
     transform=ToTensor()
 )
 
-test_data = datasets.CIFAR10(
+test_data = datasets.FashionMNIST(
     root='./data',
     train=False,
     download=True,
@@ -121,7 +121,8 @@ else:
     print(model)
 
 loss_fn = nn.CrossEntropyLoss()  # 損失関数の定義
-optimizer = torch.optim.Adam(model.parameters())  # 最適化アルゴリズムの定義
+# optimizer = torch.optim.Adam(model.parameters())  # 最適化アルゴリズムの定義
+optimizer = torch.optim.SGD(model.parameters(), lr=1e-3)
 
 ########################
 # モデルの学習用関数の定義 #
@@ -200,7 +201,7 @@ def test(dataloader, model, loss_fn):
 #####################
 # モデルの学習フェーズ #
 #####################
-epochs = 10
+epochs = 100
 
 train_acc_list  = []
 train_loss_list = []
@@ -256,9 +257,8 @@ def save_learning_curve_of_loss(train_loss_list: list, val_loss_list: list, date
     ax.plot(train_loss_list, label="Train loss")
     ax.plot(val_loss_list, label="Val loss")
 
-    # TODO: TypeError: 'builtin_function_or_method' object is not subscriptable
-    ax.set_xticks(np.concatenate([np.array[0], np.arange(4, epochs, 5)]))
-    ax.set_xticklables(np.concatenate([np.array[1], np.arange(5, epochs+1, 5)], dtype="unicode"))
+    ax.set_xticks(np.concatenate([np.array([0]), np.arange(4, epochs, 5)]))
+    ax.set_xticklabels(np.concatenate([np.array([1]), np.arange(5, epochs+1, 5)], dtype="unicode"))
 
     ax.set_ylim(0)
 
@@ -276,18 +276,22 @@ def save_learning_curve_of_acc(train_acc_list: list, val_acc_list: list, date_no
 
     fig, ax = plt.subplots(figsize=(16,9), dpi=120)
 
-    ax.set_xlabel("epoch")
-    ax.set_ylabel("accuracy")
+    ax.set_xlabel("Epochs")
+    ax.set_ylabel("Accuracy")
     ax.set_title("Learning Curve (Accuracy)")
 
     ax.plot(train_acc_list, label="Train acc")
     ax.plot(val_acc_list, label="Val acc")
 
-    # TODO: TypeError: 'builtin_function_or_method' object is not subscriptable
-    ax.set_xticks(np.concatenate([np.array[0], np.arange(4, epochs, 5)]))
-    ax.set_xticklables(np.concatenate([np.array[1], np.arange(5, epochs+1, 5)], dtype="unicode"))
+    ax.set_xticks(np.concatenate([np.array([0]), np.arange(4, epochs, 5)]))
+    ax.set_xticklabels(np.concatenate([np.array([1]), np.arange(5, epochs+1, 5)], dtype="unicode"))
 
-    ax.set_ylim(0)
+    ax.set_ylim(0.0, 1.0)
+    ax.set_yticks(np.arange(0.0, 1.1, 0.1))
+    # y軸のみにminor ticksを表示する
+    ax.yaxis.get_ticklocs(minor=True)
+    ax.minorticks_on()
+    ax.xaxis.set_tick_params(which="minor", bottom=False)
 
     ax.grid()
     ax.legend()
