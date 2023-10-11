@@ -6,7 +6,7 @@ from torchvision import datasets
 from torch.utils.data import DataLoader
 from torchvision.transforms import ToTensor
 from torch.utils.data import random_split
-from torchsummary import summary
+from torchinfo import summary
 from neural_net import NeuralNetwork
 import matplotlib.pyplot as plt
 import numpy as np
