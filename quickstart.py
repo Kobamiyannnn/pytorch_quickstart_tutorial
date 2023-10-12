@@ -1,15 +1,17 @@
+import os
+import time
+from datetime import datetime
+
+import matplotlib.pyplot as plt
+import numpy as np
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
+from torchinfo import summary
 from torchvision import datasets
 from torchvision.transforms import ToTensor
-import time
+
 from neural_net import NeuralNetwork
-from torchinfo import summary
-import matplotlib.pyplot as plt
-import numpy as np
-from datetime import datetime
-import os
 
 #####################
 # Working with data #

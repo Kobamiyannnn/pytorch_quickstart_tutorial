@@ -1,21 +1,20 @@
 # バリデーションも含めながら自分で実装してみる
 
-import torch
-import torch.nn as nn
-from torchvision import datasets
-from torch.utils.data import DataLoader
-from torchvision.transforms import ToTensor
-from torch.utils.data import random_split
-from torchinfo import summary
-from neural_net import NeuralNetwork
-import matplotlib.pyplot as plt
-import numpy as np
-
-import time
-from datetime import datetime
 import os
 import platform
+import time
+from datetime import datetime
 
+import matplotlib.pyplot as plt
+import numpy as np
+import torch
+import torch.nn as nn
+from torch.utils.data import DataLoader, random_split
+from torchinfo import summary
+from torchvision import datasets
+from torchvision.transforms import ToTensor
+
+from neural_net import NeuralNetwork
 
 ###################
 # データセットの準備 #

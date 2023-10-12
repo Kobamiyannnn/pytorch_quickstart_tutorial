@@ -1,18 +1,19 @@
-import torch
-import torch.nn as nn
-from torch.utils.data import random_split, DataLoader
-from torchvision import datasets
-from torchvision.transforms import ToTensor
-from torchinfo import summary
-import matplotlib.pyplot as plt
-import numpy as np
-from typing import Tuple, Never, Literal
-import time
-from datetime import datetime
+import csv
 import os
 import platform
+import time
+from datetime import datetime
+from typing import Literal, Never, Tuple
+
+import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
-import csv
+import torch
+import torch.nn as nn
+from torch.utils.data import DataLoader, random_split
+from torchinfo import summary
+from torchvision import datasets
+from torchvision.transforms import ToTensor
 
 from neural_net import NeuralNetwork
 
@@ -20,6 +21,11 @@ from neural_net import NeuralNetwork
 def set_device() -> str:
     """
     使用するデバイスを指定する
+
+    Returns
+    -------
+    device : str
+        PyTorchにて使用されるデバイス
     """
     # デバイスの指定
     device = (
@@ -35,7 +41,14 @@ def set_device() -> str:
 
 def fix_seed(device: str, seed: int = 0) -> None:
     """
-    各種乱数シードの固定
+    各種乱数シードの生成
+
+    Parameters
+    ----------
+    device : str
+        PyTorchにて使用されるデバイス
+    seed : int, optional
+        シード値, by default 0
     """
     torch.manual_seed(seed)
 
@@ -48,6 +61,15 @@ def fix_seed(device: str, seed: int = 0) -> None:
 def confirm_dataset(train_data: datasets, val_data: datasets, test_data: datasets) -> None:
     """
     学習データ、検証データ、テストデータのサイズ確認
+
+    Parameters
+    ----------
+    train_data : datasets
+        訓練用データセット
+    val_data : datasets
+        検証用データセット
+    test_data : datasets
+        評価用データセット
     """
     print(f"\nDataset: {train_data.__class__.__name__}")
     print(f"\tTraining data  : {len(train_data)}")
@@ -58,6 +80,21 @@ def confirm_dataset(train_data: datasets, val_data: datasets, test_data: dataset
 def get_img_info(dataloader: DataLoader) -> Tuple[int, int] | Never:
     """
     データローダーの形状を表示する。返り値としてチャンネル数と画像サイズを返す。
+
+    Parameters
+    ----------
+    dataloader : DataLoader
+        任意のデータセットから作成されたデータローダ
+
+    Returns
+    -------
+    channels, image_size : Tuple[int, int] | Never
+        画像のチャンネル数と画像の一辺を返す
+
+    Raises
+    ------
+    NotSquareImgError
+        入力画像の高さと幅が異なるときに発生する
     """
 
     class NotSquareImgError(Exception):
@@ -127,6 +164,24 @@ def train(
 ) -> Tuple[float, float]:
     """
     学習用関数。1エポック間の学習について記述する。
+
+    Parameters
+    ----------
+    model : _type_
+        _description_
+    criterion : _type_
+        _description_
+    optimizer : _type_
+        _description_
+    dataloader : DataLoader
+        _description_
+    device : str
+        _description_
+
+    Returns
+    -------
+    Tuple[float, float]
+        _description_
     """
     model.train()  # 学習モードに移行
 
@@ -319,8 +374,16 @@ class SaveLearningProgress:
 class EarlyStopping:
     def __init__(self, dir_path: str, model_name: str, patience: int = 5):
         """
-        `dir_path` (str): モデルの保存先ディレクトリ
-        `patience` (str): 訓練が停止するまでの残りエポック数
+        Early Stoppingの実装
+
+        Parameters
+        ----------
+        dir_path : str
+            モデルの保存先ディレクトリ
+        model_name : str
+            _description_
+        patience : int, optional
+            訓練が停止するまでの残りエポック数, by default 5
         """
         self.patience = patience  # 訓練が停止するまでの残りエポック数
         self.counter = 0  # エポック数の現在のカウンター値
@@ -331,7 +394,14 @@ class EarlyStopping:
 
     def __call__(self, model, val_loss: float):
         """
-        最小の損失が更新されたかの計算
+        ベストスコアが更新されたかどうかの処理
+
+        Parameters
+        ----------
+        model : _type_
+            _description_
+        val_loss : float
+            _description_
         """
         score = val_loss
 
