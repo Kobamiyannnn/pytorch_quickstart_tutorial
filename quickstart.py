@@ -5,7 +5,7 @@ from torchvision import datasets
 from torchvision.transforms import ToTensor
 import time
 from neural_net import NeuralNetwork
-from torchsummary import summary
+from torchinfo import summary
 import matplotlib.pyplot as plt
 import numpy as np
 from datetime import datetime
@@ -63,7 +63,7 @@ classes = [
 # 学習データのの表示
 plt.figure()
 for i in range(10):
-    ax = plt.subplot(2, 5, i+1)
+    ax = plt.subplot(2, 5, i + 1)
     image, label = training_data[i]
     img = image.permute(1, 2, 0)  # 軸の入れ替え (C,H,W) -> (H,W,C)
     plt.imshow(img)
@@ -129,11 +129,18 @@ def train(dataloader, model, loss_fn, optimizer):
             print(correct)
             loss, current = loss.item(), (batch + 1) * len(X)
             accuracy = correct / len(X)
-            print(f"loss: {loss:>5.4f} - accuracy: {accuracy:>5.4f} [{current:>5d}/{size:>5d}]")
+            print(
+                f"loss: {loss:>5.4f} - accuracy: {accuracy:>5.4f} "
+                + f"[{current:>5d}/{size:>5d}]"
+            )
     total_correct /= size
     total_loss /= num_batches
-    print(f"Average: \n Accuracy: {(100 * total_correct):>0.1f}%,     Loss: {total_loss:>8f}")
+    print(
+        "Average: \n "
+        + f"Accuracy: {(100 * total_correct):>0.1f}%,     Loss: {total_loss:>8f}"
+    )
     return total_loss, total_correct
+
 
 def test(dataloader, model, loss_fn):
     size = len(dataloader.dataset)
@@ -151,6 +158,7 @@ def test(dataloader, model, loss_fn):
     print(f"Test Error: \n Accuracy: {(100 * correct):>0.1f}%, Avg loss: {test_loss:>8f} \n")
     return test_loss, correct
 
+
 # 学習を行う
 elapsed_per_epoch = 0  # 1エポックを終えるまでの経過時間
 epochs = 10
@@ -167,8 +175,11 @@ avg_test_acc = 0
 
 for t in range(epochs):
     time_start = time.perf_counter()
-    print(f"Epoch {t+1} (Former epoch: {elapsed_per_epoch:.2f}s)\n-------------------------------")
-    
+    print(
+        f"Epoch {t+1} (Former epoch: {elapsed_per_epoch:.2f}s)\n"
+        + "-------------------------------"
+    )
+
     avg_train_loss, avg_train_acc = train(train_dataloader, model, loss_fn, optimizer)
     train_loss_list.append(avg_train_loss)
     train_acc_list.append(avg_train_acc)
@@ -185,7 +196,7 @@ date_now = datetime.now().isoformat(timespec="seconds")
 os.makedirs(f"results/{date_now}")
 
 # 学習曲線 (loss)
-fig, ax = plt.subplots(figsize=(16,9), dpi=120)
+fig, ax = plt.subplots(figsize=(16, 9), dpi=120)
 ax.set_xlabel("epoch")
 ax.set_ylabel("loss")
 ax.set_title("Learning Curve (Loss)")
@@ -197,7 +208,7 @@ fig.tight_layout()
 plt.savefig(f"./results/{date_now}/LC_loss_{date_now}.png")
 
 # 学習曲線 (accuracy)
-fig, ax = plt.subplots(figsize=(16,9), dpi=120)
+fig, ax = plt.subplots(figsize=(16, 9), dpi=120)
 ax.set_xlabel("epoch")
 ax.set_ylabel("accuracy")
 ax.set_title("Learning Curve (Accuracy)")

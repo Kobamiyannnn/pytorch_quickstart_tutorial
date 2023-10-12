@@ -1,9 +1,7 @@
 import torch
-import torch.nn as nn
 from torch.utils.data import DataLoader
 from torchvision import datasets
 from torchvision.transforms import ToTensor
-from neural_net import NeuralNetwork
 
 ##################
 # Loading Models #
@@ -17,11 +15,11 @@ device = (
     else "mps"
     if torch.backends.mps.is_available()
     else "cpu"
-)    
+)
 
-#model = NeuralNetwork().to(device)
-#model.load_state_dict(torch.load("model.pth"))
-#print(model.state_dict())
+# model = NeuralNetwork().to(device)
+# model.load_state_dict(torch.load("model.pth"))
+# print(model.state_dict())
 
 model = torch.jit.load("model.pth", map_location="cuda")
 
